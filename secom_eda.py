@@ -44,7 +44,8 @@ for col_idx in tqdm(secom_train_data.columns, desc = 'saving histogram...'):
 #%%
 # column별 NA을 각 columns별 median 값으로 대체하여 완전한 데이터셋 구축
 imp_med = SimpleImputer(strategy = 'median')
-imp_med.fit(secom_train_data)
-secom_train_data_with_imp_med = pd.DataFrame(imp_med.transform(secom_train_data))
+imp_med.fit(secom_train_data.iloc[:,1:-1])
+secom_train_data_with_imp_med = pd.DataFrame(imp_med.transform(secom_train_data.iloc[:,1:-1]))
+secom_train_data_with_imp_med.columns = secom_train_data.columns[1:-1]
 if not os.path.exists(os.path.join(data_path, 'uci-secom_complete_cv_%d.csv' %(int(cv_q * 100)))):
-    secom_train_data_with_imp_med.to_csv(os.path.join(data_path, 'uci-secom_complete_cv_%d.csv' %(int(cv_q * 100))))
+    secom_train_data_with_imp_med.to_csv(os.path.join(data_path, 'uci-secom_complete_cv_%d.csv' %(int(cv_q * 100))), index = False)
