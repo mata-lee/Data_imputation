@@ -375,3 +375,8 @@ print('RMSE Performance: ' + str(np.round(rmse_em, 4)))
 
 pd.DataFrame(imputed_data_med).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_imp_med' + '.csv'), index = False)
 pd.DataFrame(em_imputed).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_imp_EM' + '.csv'), index = False)
+
+# RMSE
+# GAIN: 0.0905
+# median imputation: 0.1095
+# EM imputation: 0.1453
