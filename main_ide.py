@@ -26,17 +26,6 @@ from tqdm import tqdm
 import itertools
 import time
 import datetime
-#%%
-params = {}
-params['data_name'] = 'uci-secom_complete_cv_90'
-params['miss_rate'] = 0.3
-
-params['batch_size'] = 128
-params['hint_rate'] = 0.5
-params['alpha'] = 100
-params['iterations'] = 5000
-
-# gain_parameters = {'batch_size': params['batch_size'], 'hint_rate': params['hint_rate'], 'alpha': params['alpha'], 'iterations': params['iterations']}
 
 #%%
 def main_ide(base_path, params):
@@ -98,11 +87,16 @@ total_iter = len(params_list)
 #%%
 base_path = 'C:\\Users\\kt NexR\\Desktop\\mata\\work\\OJT'
 result_path = os.path.join(base_path, '[13] result')
+if not os.path.exists(result_path):
+    os.mkdir(result_path)
 imputed_data_path = os.path.join(result_path, 'data')
+if not os.path.exists(imputed_data_path):
+    os.mkdir(imputed_data_path)
 
 result_dict = {}
 total_start = time.time()
 
+result_df = []
 for run_i, params_idx in enumerate(params_list):
     iter_start = time.time()
     print('START!!')
@@ -117,11 +111,14 @@ for run_i, params_idx in enumerate(params_list):
     params['iterations'] = params_idx[5]
 
     result_filename = '_'.join(map(str, list(params_idx)))
+    if not os.path.exists(imputed_data_path):
+        os.mkdir(imputed_data_path)
+
     imputed_data_path_iter = os.path.join(imputed_data_path, result_filename + '.xlsx')
 
     imputed_data_x, data_m, rmse_dict = main_ide(base_path, params)
 
-    result_df_iter = list(params_idx).extend(list(rmse_dict.values()))
+    result_df_iter = list(params_idx) +list(rmse_dict.values())
     result_df.append(result_df_iter)
 
     with pd.ExcelWriter(imputed_data_path_iter) as writer:
@@ -130,7 +127,7 @@ for run_i, params_idx in enumerate(params_list):
         pd.DataFrame(imputed_data_x['EM']).to_excel(writer, sheet_name='EM')
         pd.DataFrame(data_m).to_excel(writer, sheet_name = 'mask')
 
-    result_dict[params] = rmse_dict
+    result_dict['_'.join(map(str, list(params.values())))] = rmse_dict
 
     sec_iter = time.time() - iter_start
     duration_time_iter = str(datetime.timedelta(seconds = sec_iter).split("."))[0]
