@@ -1,6 +1,4 @@
 #%%
-#%%
-#%%
 # main
 '''Main function for UCI letter and spam datasets.
 '''
@@ -14,7 +12,7 @@ import argparse
 import numpy as np
 
 from data_loader import data_loader
-from gain import gain
+from impute_functions import gain, Impute_med, Impute_EM
 from utils import rmse_loss
 
 def main(args):
@@ -54,7 +52,8 @@ def main(args):
     print('RMSE Performance: ' + str(np.round(rmse, 4)))
 
     return imputed_data_x, rmse
-#%%
+
+
 if __name__ == '__main__':
     # Inputs for the main function
     parser = argparse.ArgumentParser()
@@ -93,54 +92,3 @@ if __name__ == '__main__':
 
     # Calls main function
     imputed_data, rmse = main(args)
-#%%
-
-import pandas as pd
-
-pd.DataFrame(miss_data_x).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_miss' + '.csv'), index = False)
-pd.DataFrame(imputed_data_x).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_imp_gain' + '.csv'), index = False)
-pd.DataFrame(data_m).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_miss_mask' + '.csv'), index = False)
-
-# np.loadtxt(os.path.join(os.getcwd(), '[10] data/' + data_name + '.csv'), delimiter=",", skiprows=1)
-# np.loadtxt(os.path.join(os.path.join(os.getcwd(), '[10] data/' + data_name + '_miss' + '.csv'), delimiter=",", skiprows=1)
-# np.loadtxt(os.path.join(os.path.join(os.getcwd(), '[10] data/' + data_name + '_miss' + '.csv'), delimiter=",", skiprows=1)
-# np.loadtxt(os.path.join(os.path.join(os.getcwd(), '[10] data/' + data_name + '_miss' + '.csv'), delimiter=",", skiprows=1)
-
-
-rmse_gain = rmse
-
-
-#%%
-# Mean imputation
-from sklearn.impute import SimpleImputer
-
-med_imputer = SimpleImputer(missing_values = np.nan, strategy = 'median')
-med_imputer = med_imputer.fit(miss_data_x)
-imputed_data_med = med_imputer.transform(miss_data_x)
-
-# Report the RMSE performance
-rmse_med = rmse_loss(ori_data_x, imputed_data_med, data_m)
-
-print()
-print('RMSE Performance: ' + str(np.round(rmse_med, 4)))
-
-
-#%%
-# EM imputation
-import impyute as impy
-
-data_missing = pd.DataFrame(miss_data_x)
-em_imputed = impy.em(miss_data_x)
-
-rmse_em = rmse_loss(ori_data_x, em_imputed, data_m)
-
-print()
-print('RMSE Performance: ' + str(np.round(rmse_em, 4)))
-
-pd.DataFrame(imputed_data_med).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_imp_med' + '.csv'), index = False)
-pd.DataFrame(em_imputed).to_csv(os.path.join(os.getcwd(), '[10] data/' + data_name + '_imp_EM' + '.csv'), index = False)
-
-# RMSE
-# GAIN: 0.0905
-# median imputation: 0.1095
-# EM imputation: 0.1453
