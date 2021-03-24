@@ -105,7 +105,6 @@ for run_i, params_idx in enumerate(params_list):
     params = {}
     params['data_name'] = params_idx[0]
     params['miss_rate'] = params_idx[1]
-
     params['batch_size'] = params_idx[2]
     params['hint_rate'] = params_idx[3]
     params['alpha'] = params_idx[4]
