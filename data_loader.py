@@ -8,11 +8,7 @@ import numpy as np
 from utils import binary_sampler
 from keras.datasets import mnist
 
-data_name = 'uci-secom_complete_cv_90'
-miss_rate = 0.2
-
-
-def data_loader(data_name, miss_rate):
+def data_loader(base_path, data_name, miss_rate):
     '''Loads datasets and introduce missingness.
 
     Args:
@@ -27,7 +23,7 @@ def data_loader(data_name, miss_rate):
 
     # Load data
     if data_name in ['letter', 'spam', 'uci-secom_complete_cv_90']:
-        file_name = os.path.join(os.getcwd(), '[10] data/' + data_name + '.csv')
+        file_name = os.path.join(base_path, '[10] data/' + data_name + '.csv')
         data_x = np.loadtxt(file_name, delimiter=",", skiprows=1)
     elif data_name == 'mnist':
         (data_x, _), _ = mnist.load_data()

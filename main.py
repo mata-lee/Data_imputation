@@ -4,6 +4,8 @@
 '''
 
 # Necessary packages
+
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -11,10 +13,22 @@ from __future__ import print_function
 import argparse
 import numpy as np
 
+import sys
+import os
+base_path = 'C:\\Users\\kt NexR\\Desktop\\mata\\work\\OJT'
+if not os.path.join(base_path, '[11] code') in sys.path:
+    sys.path.append(os.path.join(base_path, '[11] code'))
+
 from data_loader import data_loader
 from impute_functions import gain, Impute_med, Impute_EM
 from utils import rmse_loss
 
+"""
+data_name = os.path.join(os.getcwd(), '[10] data/uci-secom_complete_cv_90.csv')
+data_name = 'uci-secom_complete_cv_90'
+miss_rate = 0.3
+gain_parameters = {'batch_size': 128, 'hint_rate': 0.5, 'alpha': 100, 'iterations': 5000}
+"""
 def main(args):
     '''Main function for UCI letter and spam datasets.
 
@@ -27,7 +41,7 @@ def main(args):
       - iterations: iterations
 
     Returns:
-      - imputed_data_x: imputed data
+      - imputed_data_x: (Dict) imputed data
       - rmse: Root Mean Squared Error
     '''
 
@@ -40,18 +54,27 @@ def main(args):
                        'iterations': args.iterations}
 
     # Load data and introduce missingness
-    ori_data_x, miss_data_x, data_m = data_loader(data_name, miss_rate)
+    ori_data_x, miss_data_x, data_m = data_loader(base_path, data_name, miss_rate)
 
     # Impute missing data
-    imputed_data_x = gain(miss_data_x, gain_parameters)
+    imputed_data_x = {}
+    imputed_data_x['GAIN'] = gain(miss_data_x, gain_parameters)
+    imputed_data_x['Median'] = Impute_med(miss_data_x)
+    imputed_data_x['EM'] = Impute_EM(miss_data_x)
 
     # Report the RMSE performance
-    rmse = rmse_loss(ori_data_x, imputed_data_x, data_m)
+    rmse_dict = {}
+    rmse_dict['GAIN'] = rmse_loss(ori_data_x, imputed_data_x['GAIN'], data_m)
+    rmse_dict['Median'] = rmse_loss(ori_data_x, imputed_data_x['Median'], data_m)
+    rmse_dict['EM'] = rmse_loss(ori_data_x, imputed_data_x['EM'], data_m)
 
     print()
-    print('RMSE Performance: ' + str(np.round(rmse, 4)))
+    print('gain_parameters:')
+    print(gain_parameters)
+    print('RMSE Performance:')
+    print(rmse_dict)
 
-    return imputed_data_x, rmse
+    return imputed_data_x, rmse_dict
 
 
 if __name__ == '__main__':
@@ -59,8 +82,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--data_name',
-        choices=['letter', 'spam'],
-        default='spam',
+        choices=['letter', 'spam', 'uci-secom_complete_cv_90'],
+        default='uci-secom_complete_cv_90',
         type=str)
     parser.add_argument(
         '--miss_rate',

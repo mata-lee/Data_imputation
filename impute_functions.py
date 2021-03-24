@@ -192,7 +192,7 @@ def Impute_med(data_x):
     Returns:
       - imputed_data: imputed data
     '''
-    imputer_med = SimpleImputer(missing_values=np.nan, strategy, 'median')
+    imputer_med = SimpleImputer(missing_values=np.nan, strategy='median')
     imputer_med = imputer_med.fit(data_x)
     imputed_data = imputer_med.transform(data_x)
 
