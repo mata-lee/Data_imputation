@@ -97,9 +97,10 @@ result_dict = {}
 total_start = time.time()
 
 result_df = []
+print('START!!')
+
 for run_i, params_idx in enumerate(params_list):
     iter_start = time.time()
-    print('START!!')
     print('%d / %d' %(run_i + 1, total_iter))
     params = {}
     params['data_name'] = params_idx[0]
@@ -130,18 +131,17 @@ for run_i, params_idx in enumerate(params_list):
     result_dict['_'.join(map(str, list(params.values())))] = rmse_dict
 
     sec_iter = time.time() - iter_start
-    duration_time_iter = str(datetime.timedelta(seconds = sec_iter).split("."))[0]
+    duration_time_iter = str(datetime.timedelta(seconds = sec_iter)).split(".")[0]
     print(duration_time_iter)
 
 print('FINISH!!!')
 sec = time.time() - total_start
-duration_time = str(datetime.timedelta(seconds=sec).split("."))[0]
+duration_time = str(datetime.timedelta(seconds=sec)).split(".")[0]
 print(duration_time)
-
-result_df = pd.DataFrame(result_df)
-result_df.columns = ['data_name', 'miss_rate', 'batch_size', 'hint_rate', 'alpha', 'iterations', 'RMSE_GAIN', 'RMSE_GAIN', 'RMSE_median', 'RMSE_EM']
+result_df.iloc[0,:]
+result_df.columns = ['data_name', 'miss_rate', 'batch_size', 'hint_rate', 'alpha', 'iterations', 'RMSE_GAIN', 'RMSE_median', 'RMSE_EM']
 
 today_date = ''.join(str(datetime.date.today()).split('-'))[2:]
 
-result_df.to_csv(os.path.join(result_path, 'experiment_%s' %(today_date)), index = False)
+result_df.to_csv(os.path.join(result_path, 'experiment_%s.csv' %(today_date)))
 
