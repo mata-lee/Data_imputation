@@ -137,7 +137,8 @@ print('FINISH!!!')
 sec = time.time() - total_start
 duration_time = str(datetime.timedelta(seconds=sec)).split(".")[0]
 print(duration_time)
-result_df.iloc[0,:]
+
+result_df = pd.DataFrame(result_df)
 result_df.columns = ['data_name', 'miss_rate', 'batch_size', 'hint_rate', 'alpha', 'iterations', 'RMSE_GAIN', 'RMSE_median', 'RMSE_EM']
 
 today_date = ''.join(str(datetime.date.today()).split('-'))[2:]
