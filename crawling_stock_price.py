@@ -4,10 +4,16 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.font_manager as fm
 
+import os
 from tqdm import tqdm
 
+# For Window
 font_name = fm.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
 mpl.rc('font', family=font_name)
+
+# For mac
+mpl.rcParams['font.family'] = "AppleGothic"
+
 
 mpl.rcParams['axes.unicode_minus'] = False
 #%%
@@ -66,8 +72,9 @@ for i, filename in enumerate(nasdaq_filename):
     else:
         df_nasdaq = pd.concat([df_nasdaq, pd.read_csv(os.path.join(data_path, filename))])
 
-nasdaq_symbol = df_nasdaq['기호']
-nasdaq_symbol
+# 중복되는 회사 제외(ex. 알파벳 C, 알파벳 A)
+df_nasdaq['종목2'] = df_nasdaq['종목'].apply(lambda x: x.split()[0])
+nasdaq_symbol = df_nasdaq.drop_duplicates('종목2')['기호']
 
-from gensim.models.word2vec import word2Vec
-
+#%%
+# 
