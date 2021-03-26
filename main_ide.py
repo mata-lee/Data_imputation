@@ -75,7 +75,8 @@ def main_ide(base_path, params):
 
     return imputed_data_x, data_m, rmse_dict
 #%%
-data_name_list = ['uci-secom_complete_cv_90']
+# data_name_list = ['uci-secom_complete_cv_90']
+data_name_list = ['NASDAQ_top173_gme_stock_price_complete']
 miss_rate_list = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]
 batch_size_list = [128]
 hint_rate_list = [0.3, 0.5, 0.7, 0.9]
@@ -89,7 +90,8 @@ base_path = 'C:\\Users\\kt NexR\\Desktop\\mata\\work\\OJT'
 result_path = os.path.join(base_path, '[13] result')
 if not os.path.exists(result_path):
     os.mkdir(result_path)
-imputed_data_path = os.path.join(result_path, 'data')
+today_date = ''.join(str(datetime.datetime.today().date()).split('-')[1:])
+imputed_data_path = os.path.join(result_path, 'data_%s' %(today_date))
 if not os.path.exists(imputed_data_path):
     os.mkdir(imputed_data_path)
 
@@ -141,7 +143,7 @@ print(duration_time)
 result_df = pd.DataFrame(result_df)
 result_df.columns = ['data_name', 'miss_rate', 'batch_size', 'hint_rate', 'alpha', 'iterations', 'RMSE_GAIN', 'RMSE_median', 'RMSE_EM']
 
-today_date = ''.join(str(datetime.date.today()).split('-'))[2:]
+# today_date = ''.join(str(datetime.date.today()).split('-'))[2:]
 
 result_df.to_csv(os.path.join(result_path, 'experiment_%s.csv' %(today_date)))
 
