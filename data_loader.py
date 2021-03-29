@@ -22,7 +22,7 @@ def data_loader(base_path, data_name, miss_rate):
     '''
 
     # Load data
-    if data_name in ['letter', 'spam', 'uci-secom_complete_cv_90']:
+    if data_name in ['letter', 'spam', 'uci-secom_complete_cv_90', 'NASDAQ_top173_gme_stock_price_complete']:
         file_name = os.path.join(base_path, '[10] data/' + data_name + '.csv')
         data_x = np.loadtxt(file_name, delimiter=",", skiprows=1)
     elif data_name == 'mnist':
