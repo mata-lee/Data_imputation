@@ -4,7 +4,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import matplotlib as mpl
+import matplotlib.font_manager as fm
+
 from sklearn.metrics import r2_score, mean_squared_error
+
+font_name = fm.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
+mpl.rc('font', family=font_name)
+
+mpl.rcParams['axes.unicode_minus'] = False
 
 #%%
 parameters = {'miss_rate': 0.4,
@@ -28,7 +36,11 @@ imp_Med = pd.read_excel(os.path.join(imputation_filepath, filename), sheet_name=
 imp_EM = pd.read_excel(os.path.join(imputation_filepath, filename), sheet_name='EM', index_col=0)
 imp_mask = pd.read_excel(os.path.join(imputation_filepath, filename), sheet_name='mask', index_col=0)
 
-origin_data.columns = imp_GAIN.columns
+imp_GAIN.columns = origin_data.columns
+imp_Med.columns = origin_data.columns
+imp_EM.columns = origin_data.columns
+imp_mask.columns = origin_data.columns
+
 all_values_origin = pd.melt(origin_data)['value'] - pd.melt((origin_data * imp_mask))['value']
 all_values_GAIN = pd.melt(imp_GAIN)['value'] - pd.melt((imp_GAIN * imp_mask))['value']
 all_values_Med = pd.melt(imp_Med)['value'] - pd.melt((imp_Med * imp_mask))['value']
@@ -69,8 +81,13 @@ summuary_result = drop_zeros_values.describe()
 summuary_result = pd.concat([summuary_result, pd.DataFrame(r2_score_dict, index = ['R^2', 'rmse'])])
 #%%
 # GME stock price
-imp_mask.sum().sum() / (imp_mask.shape[0] * imp_mask.shape[1])
-imp_mask.iloc[:,-1].sum() / imp_mask.shape[0]
+(1- imp_mask).sum().sum() / (imp_mask.shape[0] * imp_mask.shape[1])
+
+
+((1- imp_mask).sum() / imp_mask.shape[0]).plot()
+plt.axhline(y = 0.40, color = 'red')
+plt.title(f'종목별 결측값 비율(miss_rate: {parameters["miss_rate"]})')
+plt.show()
 
 df_GME_stock_price = pd.concat([origin_data.iloc[:,-1], imp_GAIN.iloc[:,-1], imp_Med.iloc[:,-1], imp_EM.iloc[:,-1], imp_mask.iloc[:,-1]], axis = 1)
 df_GME_stock_price.columns = ['Original', 'GAIN', 'Median', 'EM', 'Mask']
@@ -89,6 +106,7 @@ df_GME_stock_price.loc[df_GME_stock_price['Mask'] == 0,['Original', 'GAIN', 'Med
 plt.show()
 #%%
 # Check max std: GME
+import numpy as np
 np.argmax(origin_data.std())
 np.argmin(origin_data.std())
 
