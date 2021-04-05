@@ -1,5 +1,10 @@
 import os
+import sys
+base_path = 'C:\\Users\\kt NexR\\Desktop\\mata\\work\\OJT'
+if not os.path.join(base_path, '[11] code') in sys.path:
+    sys.path.append(os.path.join(base_path, '[11] code'))
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -9,11 +14,12 @@ import matplotlib.font_manager as fm
 
 from sklearn.metrics import r2_score, mean_squared_error
 
+from utils import *
+
 font_name = fm.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
 mpl.rc('font', family=font_name)
 
 mpl.rcParams['axes.unicode_minus'] = False
-
 #%%
 parameters = {'miss_rate': 0.4,
               'batch_size': 128,
@@ -57,15 +63,6 @@ drop_zeros_values_Med.plot(linewidth = 1,label = 'Median')
 drop_zeros_values_EM.plot(linewidth = 1,label = 'EM')
 plt.legend()
 plt.show()
-# #%%
-#
-# drop_zeros_values_origin.plot(linewidth = 1,label = 'Original')
-# drop_zeros_values_GAIN.plot(linewidth = 1,label = 'GAIN')
-# drop_zeros_values_Med.plot(linewidth = 1,label = 'Median')
-# drop_zeros_values_EM.plot(linewidth = 1,label = 'EM')
-# plt.legend()
-# plt.ylim(0,500)
-# plt.show()
 #%%
 drop_zeros_values = pd.DataFrame({'GAIN': drop_zeros_values_origin - drop_zeros_values_GAIN,
                                   'Median': drop_zeros_values_origin - drop_zeros_values_Med,
@@ -74,19 +71,23 @@ drop_zeros_values = pd.DataFrame({'GAIN': drop_zeros_values_origin - drop_zeros_
 sns.histplot(drop_zeros_values)
 plt.show()
 
-r2_score_dict = {'GAIN': [r2_score(drop_zeros_values_origin, drop_zeros_values_GAIN), mean_squared_error(drop_zeros_values_origin, drop_zeros_values_GAIN) ** 0.5],
-                 'Median': [r2_score(drop_zeros_values_origin, drop_zeros_values_Med), mean_squared_error(drop_zeros_values_origin, drop_zeros_values_Med) ** 0.5],
-                 'EM': [r2_score(drop_zeros_values_origin, drop_zeros_values_EM), mean_squared_error(drop_zeros_values_origin, drop_zeros_values_EM) ** 0.5]}
+score_dict = {'GAIN': [r2_score(drop_zeros_values_origin, drop_zeros_values_GAIN), rmse_loss(origin_data.T.to_numpy(), imp_GAIN.T.to_numpy(), imp_mask.T.to_numpy())],
+              'Median': [r2_score(drop_zeros_values_origin, drop_zeros_values_Med), rmse_loss(origin_data.T.to_numpy(), imp_Med.T.to_numpy(), imp_mask.T.to_numpy())],
+              'EM': [r2_score(drop_zeros_values_origin, drop_zeros_values_EM), rmse_loss(origin_data.T.to_numpy(), imp_EM.T.to_numpy(), imp_mask.T.to_numpy())]}
 summuary_result = drop_zeros_values.describe()
-summuary_result = pd.concat([summuary_result, pd.DataFrame(r2_score_dict, index = ['R^2', 'rmse'])])
+
+summuary_result = pd.concat([summuary_result, pd.DataFrame(score_dict, index = ['R^2', 'norm_rmse'])])
+#%%
+print(f'RMSE loss: {summuary_result.loc["norm_rmse"]}')
 #%%
 # GME stock price
-(1- imp_mask).sum().sum() / (imp_mask.shape[0] * imp_mask.shape[1])
+# Miss_rate for GME
+print(f'Miss_rate for GME: {(1- imp_mask).sum().sum() / (imp_mask.shape[0] * imp_mask.shape[1])}')
 
-
-((1- imp_mask).sum() / imp_mask.shape[0]).plot()
+((1- imp_mask).sum() / imp_mask.shape[0]).plot(kind = 'bar')
 plt.axhline(y = 0.40, color = 'red')
 plt.title(f'종목별 결측값 비율(miss_rate: {parameters["miss_rate"]})')
+plt.ylim(0.35, 0.45)
 plt.show()
 
 df_GME_stock_price = pd.concat([origin_data.iloc[:,-1], imp_GAIN.iloc[:,-1], imp_Med.iloc[:,-1], imp_EM.iloc[:,-1], imp_mask.iloc[:,-1]], axis = 1)
@@ -106,10 +107,10 @@ df_GME_stock_price.loc[df_GME_stock_price['Mask'] == 0,['Original', 'GAIN', 'Med
 plt.show()
 #%%
 # Check max std: GME
-import numpy as np
-np.argmax(origin_data.std())
-np.argmin(origin_data.std())
+print(f'Max std column: {origin_data.columns[np.argmax(origin_data.std())]}')
+print(f'Min std column: {origin_data.columns[np.argmin(origin_data.std())]}')
 
 origin_data.std().plot()
 plt.title('Std of Stocks')
 plt.show()
+#%%
